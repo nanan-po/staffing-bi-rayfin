@@ -1,0 +1,4 @@
+{
+  "query": "EVALUATE ROW(\"Dự án\", CONCATENATEX(VALUES('F_HR'[Project Name]), IF(ISBLANK('F_HR'[Project Name]), \"(Blank)\", 'F_HR'[Project Name]), \", \"), \"Kênh\", CONCATENATEX(VALUES('F_HR'[Channel]), IF(ISBLANK('F_HR'[Channel]), \"(Blank)\", 'F_HR'[Channel]), \", \"), \"Tháng\", CONCATENATEX(VALUES('D_Date'[Month]), IF(ISBLANK('D_Date'[Month]), \"(Blank)\", FORMAT('D_Date'[Month], \"0\")), \", \", 'D_Date'[Month], ASC))",
+  "resultSetRowCountLimit": 10
+}

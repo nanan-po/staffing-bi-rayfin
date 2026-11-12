@@ -1,0 +1,5 @@
+
+{
+  "query": "EVALUATE ROW(\"Năm\", COUNTROWS(VALUES('D_Date'[Year])), \"Tháng\", COUNTROWS(VALUES('D_Date'[Month])), \"Dự án\", COUNTROWS(VALUES('F_HR'[Project Name])), \"Kênh\", COUNTROWS(VALUES('F_HR'[Channel])), \"Miền\", COUNTROWS(VALUES('F_HR'[Region Code])), \"Tỉnh\", COUNTROWS(VALUES('F_HR'[Old Province])), \"Vị trí\", COUNTROWS(VALUES('F_HR'[Position])), \"Quản lý cấp 1\", COUNTROWS(VALUES('F_HR'[Level 1 Manager Name])), \"Quản lý cấp 2\", COUNTROWS(VALUES('F_HR'[Level 2 Manager Name])))",
+  "resultSetRowCountLimit": 10
+}

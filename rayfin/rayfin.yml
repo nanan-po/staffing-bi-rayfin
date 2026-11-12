@@ -1,0 +1,41 @@
+id: staffing-rayfin-app
+name: Staffing Rayfin App
+version: 1.0.0
+services:
+  auth:
+    enabled: true
+    fabric:
+      enabled: true
+    allowedRedirectUris:
+      - http://localhost:5173
+  data:
+    enabled: false
+  storage:
+    enabled: false
+  staticHosting:
+    enabled: true
+    folder: dist
+    buildCommand: npm run build:fabric
+    indexDocument: index.html
+    assetAccess: protected
+connectors:
+  - name: staffingvnm
+    config:
+      workspaceId: b1ab6b9a-1cd6-4318-9d7e-19cbe10ee650
+      itemId: 358c6ab8-4267-4d0c-875f-89d99eb2f14f
+    auth:
+      type: delegated
+    version: "1"
+    operations:
+      - name: executeQuery
+    type: fabric-semanticmodel
+  - name: staffingvnmpo
+    type: fabric-semanticmodel
+    config:
+      workspaceId: 8ae93cdf-8cdf-4c9a-b238-5c7616194909
+      itemId: 548cf53b-5e3d-4c6b-9305-bd919e00c284
+    auth:
+      type: delegated
+    version: "1"
+    operations:
+      - name: executeQuery

@@ -1,0 +1,5 @@
+
+{
+  "query": "EVALUATE CALCULATETABLE(ROW(\"NS Hiện tại\", [NS Hiện tại], \"NS Kế hoạch\", [NS Kế hoạch], \"Tỷ lệ thực đạt (%)\", [Tỷ lệ thực đạt (%)], \"NS còn thiếu\", [NS còn thiếu], \"Tỷ lệ NS thiếu (%)\", [Tỷ lệ NS thiếu (%)], \"NS Mới\", [NS Mới], \"NS Nghỉ\", [NS Nghỉ], \"Biến động Mới-Nghỉ\", [Biến động Mới-Nghỉ], \"Tỷ lệ Nghỉ (%)\", [Tỷ lệ Nghỉ (%)]), 'D_Date'[Year] = 2026, 'D_Date'[Month] = 10)",
+  "resultSetRowCountLimit": 10
+}

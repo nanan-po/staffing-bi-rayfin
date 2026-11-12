@@ -1,0 +1,5 @@
+
+{
+  "query": "EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('F_HC PLAN'[Region], \"HC ke hoach\", SUM('F_HC PLAN'[HC Plan]), \"HC hien tai\", [NS Hiện tại theo hc_plan], \"Ty le thuc dat\", DIVIDE([NS Hiện tại theo hc_plan], SUM('F_HC PLAN'[HC Plan])), \"Vacant\", SUM('F_HC PLAN'[Vacant])), FILTER(ALL('F_HC PLAN'[Report Month]), YEAR('F_HC PLAN'[Report Month]) = 2026 && MONTH('F_HC PLAN'[Report Month]) = 10)) ORDER BY 'F_HC PLAN'[Region]",
+  "resultSetRowCountLimit": 100
+}

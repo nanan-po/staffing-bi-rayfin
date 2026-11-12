@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; connect-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; object-src 'none'; base-uri 'self'"/>
+
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AcacyONE | Staffing BI — Google Sheets Ready</title>
+
+<link rel="stylesheet" href="./assets/css/dashboard.css">
+</head>
+<body>
+<div class="app-layout">
+<aside class="acacy-sidebar" aria-label="Điều hướng AcacyONE">
+ <div class="acacy-page-identity" aria-live="polite"><div class="brand-name">HEADCOUNT MANAGEMENT</div><div class="brand-sub">Nhân sự hiện tại &amp; Cơ cấu nhân sự</div></div>
+ <nav class="acacy-menu" aria-label="Chức năng">
+  <button class="acacy-side-item" data-side-page="HC" type="button"><svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg><span>Tổng quan</span></button>
+  <button class="acacy-side-item active" data-side-page="HC" type="button"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 20v-2a5.5 5.5 0 0 1 11 0v2M17 5a3 3 0 0 1 0 6M17 14c2.5.2 4 2 4 4v2"/></svg><span>Quản trị nhân sự</span></button>
+  <button class="acacy-side-item" data-side-page="REC" type="button"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><path d="M4 19v-2a5 5 0 0 1 10 0v2M16 11l2 2 4-4M16 19h6"/></svg><span>Tuyển dụng</span></button>
+  <button class="acacy-side-item" data-side-page="ATD" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 3"/></svg><span>Chấm công</span></button>
+  <button class="acacy-side-item" data-side-page="PAYROLL" type="button"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18M16 15h2"/></svg><span>Tiền lương</span></button>
+  <button class="acacy-side-item" data-side-action="settings" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3m10-10h-3M5 12H2m17.1-7.1L17 7M7 17l-2.1 2.1m14.2 0L17 17M7 7 4.9 4.9"/></svg><span>Cài đặt</span></button>
+ </nav>
+ <div class="acacy-sidebar-wave"></div>
+ <p class="acacy-sidebar-foot">AcacyONE · Staffing</p>
+</aside>
+<div class="shell">
+<header class="header" aria-hidden="true">
+<nav class="nav">
+<span class="active">HEADCOUNT<br/>MANAGEMENT</span><span>ATTENDANCE</span><span>TRAINING</span><span>PAYROLL</span><span>OI</span><span>MYSTERY SHOPPER</span><span>RECRUITMENT</span><span class="home">⌂</span>
+</nav>
+<nav aria-label="Staffing modules" class="module-nav">
+<button class="module-tab active" data-page="HC"><span>01</span> Headcount</button>
+<button class="module-tab" data-page="REC"><span>02</span> Recruitment</button>
+<button class="module-tab" data-page="ATD"><span>03</span> Attendance</button>
+<button class="module-tab" data-page="PAYROLL"><span>04</span> Payroll</button>
+</nav>
+</header>
+
+<header class="dashboard-topbar" id="dashboardTopbar" aria-label="Trạng thái dữ liệu và bộ lọc dashboard">
+<section id="staffingApiPanel" aria-live="polite">
+  <div class="api-left">
+    <div class="api-head"><span class="api-title">XEM TRƯỚC GIAO DIỆN</span><span class="api-badge demo" id="staffingApiMode">DEMO</span></div>
+    <span class="api-sub" id="staffingApiStatus">Đang sử dụng dữ liệu mẫu. Đã tắt kết nối Google Sheets và API.</span>
+  </div>
+  <div class="api-note-wrap"><span class="api-note-label">Lưu ý</span><div class="api-note" id="staffingApiNote">Chỉ xem trước layout. Không tải dữ liệu nhân sự thật vào bản demo.</div></div>
+</section>
+<div class="dashboard-filter-slot" id="dashboardFilterSlot" aria-label="Bộ lọc theo phân hệ"></div>
+</header>
+
+<div class="page-view active" id="pageHC">
+<span id="dataMode" hidden></span>
+<section class="import-panel">
+<div><strong>Nhập dữ liệu nhân sự từ Excel</strong><small id="importStatus">Bản xem trước chỉ dùng dữ liệu demo; chức năng nhập Excel được tắt để tránh đưa dữ liệu thật lên giao diện.</small></div>
+<input accept=".xlsx,.xls,.csv" hidden="" id="excelFile" type="file"/>
+<button class="upload-btn" id="uploadBtn" type="button" disabled title="Bản xem trước: không nhập dữ liệu thật">↑ Cập nhật Excel</button>
+<button class="reset-btn" id="resetDemo" type="button">Khôi phục dữ liệu mẫu</button>
+</section>
+<section class="filters" id="filters">
+<div class="filter"><label>Dự án</label><select class="staffing-native-project" aria-label="Dự án từ Google Sheets"><option value="All">Tất cả dự án</option></select></div>
+<div class="filter"><label for="year">Năm</label><select id="year"><option>2026</option><option>2025</option></select></div>
+<div class="filter"><label for="month">Tháng</label><select id="month"><option value="0">Tất cả / YTD</option><option value="1">T01</option><option value="2">T02</option><option value="3">T03</option><option value="4">T04</option><option value="5">T05</option><option value="6">T06</option><option value="7">T07</option><option value="8">T08</option><option value="9">T09</option><option value="10">T10</option><option value="11">T11</option><option value="12">T12</option></select></div>
+<div class="filter"><label for="region">Miền</label><select id="region"><option value="All">Tất cả</option><option>Miền Bắc</option><option>Miền Trung</option><option>Miền Nam</option></select></div>
+<div class="filter"><label for="province">Tỉnh</label><select id="province"><option value="All">Tất cả</option><option>Hà Nội</option><option>Đà Nẵng</option><option>TP. Hồ Chí Minh</option><option>Cần Thơ</option></select></div>
+<div class="filter"><label for="position">Vị trí</label><select id="position"><option value="All">Tất cả</option><option>NVBH</option><option>NVHT</option><option>CHT-S</option><option>TBHV</option><option>CVQL</option></select></div>
+<div class="filter"><label for="tbhv">Quản lý Cấp 1</label><select id="tbhv"><option value="All">Tất cả</option><option>Cao Phương Anh</option><option>Nguyễn Thị Thu Hằng</option><option>Nguyễn Thị Xuân Thảo</option></select></div>
+<div class="filter"><label for="cvql">Quản lý Cấp 2</label><select id="cvql"><option value="All">Tất cả</option><option>Đỗ Thị Hà</option><option>Hoàng Tiến Đạt</option><option>Hồ Nghĩa Tuấn</option></select></div>
+<button class="clear" id="clear">⌫ Xóa tất cả bộ lọc</button>
+</section>
+<section class="kpis">
+<div class="kpi-grid">
+ <article class="summary-card current-summary">
+  <div class="hc-card-heading"><svg class="hc-ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M17 5a3 3 0 0 1 0 6M17 14c2.4.3 4 2 4 4v2"/></svg><span>Quy mô nhân sự hiện tại</span></div>
+  <div class="hc-current-line"><strong class="summary-number" id="kpiCurrent">1,079</strong><span class="hc-delta-chip" id="hcGrowthChip">Theo kỳ đang chọn</span></div>
+  <div class="hc-plan-caption">HC Plan Google Sheets: <strong id="kpiPrev">--</strong><span id="hcGrowthContext">Dữ liệu nhân sự hiện tại</span></div>
+ </article>
+ <div class="hc-mini-kpis">
+  <article class="hc-mini-card"><span class="hc-mini-icon"><svg class="hc-mini-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span><div class="hc-mini-content"><span>Tỷ lệ thực đạt</span><strong id="kpiHire">--</strong></div></article>
+  <article class="hc-mini-card"><span class="hc-mini-icon"><svg class="hc-mini-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M5 21v-3a7 7 0 0 1 14 0v3H5"/></svg></span><div class="hc-mini-content"><span>Nhân sự còn thiếu</span><strong id="kpiVacant">-- <em>HC</em></strong><small id="kpiVacantPct">--</small></div></article>
+ </div>
+ <article class="summary-card movement-summary">
+  <div class="hc-card-heading hc-movement-heading"><svg class="hc-ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18M4 15l5-5 4 3 7-8M16 5h4v4"/></svg><span id="movementTitle">BIẾN ĐỘNG NHÂN SỰ (THÁNG 10/2026)</span></div>
+  <div class="movement-grid">
+   <div><small>Nhân sự mới</small><strong id="movementHire">324</strong><span class="hc-metric-chip green">Tuyển mới</span></div>
+   <div><small>Nhân sự nghỉ việc</small><strong id="kpiQuit">420</strong><span class="hc-metric-chip red">Nghỉ việc</span></div>
+   <div><small>Biến động vào – nghỉ</small><strong class="negative" id="movementNet">−96</strong><span class="hc-metric-chip blue">Chênh lệch</span></div>
+  </div>
+ </article>
+</div>
+<article class="chart-card"><div class="chart-title">⌁ &nbsp;Xu hướng nhân sự &amp; biến động</div><div class="legend"><span><b style="background:#7b8494"></b>Định biên kế hoạch</span><span><b style="background:#0b36a0"></b>Nhân sự hiện tại</span><span><b style="background:#18a558"></b>Nhân sự mới</span><span><b style="background:#e9467b"></b>Nhân sự nghỉ việc</span></div><div class="chart-wrap"><canvas height="300" id="trend" width="1000"></canvas></div><div class="chart-hint">Chọn tháng trên biểu đồ để xem quy mô nhân sự và các chỉ số của kỳ đó</div></article>
+<article class="placeholder-card hotspot-card"><div class="panel-title hotspot-heading"><span>ĐIỂM NÓNG NGUỒN LỰC</span><div class="hotspot-slicers" id="hotspotDimensionButtons"><button class="hotspot-chip active" data-dim="region" type="button">Miền</button><button class="hotspot-chip" data-dim="province" type="button">Tỉnh</button><button class="hotspot-chip" data-dim="position" type="button">Vị trí</button><button class="hotspot-chip" data-dim="tbhvName" type="button">Quản lý Cấp 1</button><button class="hotspot-chip" data-dim="cvName" type="button">Quản lý Cấp 2</button></div></div><div class="hotspot-table-scroll"><div class="placeholder-toolbar"><span>Vị trí</span><span>Định biên kế hoạch</span><span>Nhân sự hiện tại</span><span>% thực đạt</span><span>Nhân sự còn thiếu</span></div><div id="hotspotRows"><div class="placeholder-row"><b>--</b><span>--</span><span>--</span><span>--</span><span>--</span></div><div class="placeholder-row"><b>--</b><span>--</span><span>--</span><span>--</span><span>--</span></div><div class="placeholder-row"><b>--</b><span>--</span><span>--</span><span>--</span><span>--</span></div></div></div><div class="placeholder-row total"><b>Tổng</b><span>--</span><span id="hotspotCurrent">--</span><span>--</span><span>--</span></div><div class="placeholder-note">Mặc định hiển thị theo từng miền. Bấm thêm Tỉnh, Vị trí hoặc cấp quản lý để xem kết hợp; chưa có dữ liệu kế hoạch nhân sự nên HC kế hoạch, % thực đạt và Vacant hiển thị --.</div></article>
+</section>
+<div class="dashboard-row-two">
+<article class="placeholder-card quit-card"><div class="panel-title">⌁ &nbsp;Xu hướng tỷ lệ nghỉ việc</div><div class="quit-chart-wrap"><canvas aria-label="Biểu đồ xu hướng tỷ lệ nghỉ việc theo tháng" height="220" id="quitTrend" width="620"></canvas></div><div class="placeholder-note" id="quitTrendNote">Chọn tháng trên biểu đồ để xem tỷ lệ nghỉ việc của kỳ đó.</div></article>
+<article class="placeholder-card composition-card"><div class="composition-heading"><div class="panel-title">♟ &nbsp;Cơ cấu nhân sự nghỉ việc</div><select aria-label="Chọn tiêu chí cơ cấu nghỉ việc" id="quitCompositionDimension"><option selected="" value="region">Miền</option><option value="province">Tỉnh</option><option value="position">Vị trí</option><option value="tbhvName">Quản lý Cấp 1</option><option value="cvName">Quản lý Cấp 2</option><option value="gender">Giới tính</option><option value="age">Nhóm tuổi</option><option value="education">Học vấn</option><option value="tenure">Thâm niên</option><option value="status">Trạng thái NV</option></select></div><div class="quit-composition-bars" id="quitCompositionBars"></div><div class="placeholder-note" id="quitCompositionNote">Phân loại nhân viên nghỉ việc theo tiêu chí đã chọn.</div></article>
+<article class="placeholder-card recruitment-card resignation-reasons-card" aria-label="Danh sách nhân viên nghỉ việc theo lý do"><div class="resignation-heading"><div class="panel-title">▤ &nbsp;Phân tích nghỉ việc theo nhóm</div><select id="resignationDimension" aria-label="Chọn tiêu chí danh sách nhân viên nghỉ việc"><option value="region" selected>Miền</option><option value="province">Tỉnh</option><option value="position">Vị trí</option><option value="tbhvName">Quản lý Cấp 1</option><option value="cvName">Quản lý Cấp 2</option><option value="gender">Giới tính</option><option value="age">Nhóm tuổi</option><option value="education">Học vấn</option><option value="tenure">Thâm niên</option><option value="status">Trạng thái NV</option></select></div><div class="resignation-scroll"><table class="resignation-table"><thead><tr class="resignation-period"><th colspan="2">Month</th><th id="resignationPeriod" colspan="2">—</th></tr><tr><th id="resignationDimHeader">Chức vụ</th><th>Lý do nghỉ</th><th>Số lượng</th><th>% Nghỉ việc</th></tr></thead><tbody id="resignationReasonRows"><tr><td colspan="4">Đang tải dữ liệu…</td></tr></tbody></table></div><div class="resignation-note" id="resignationReasonNote"></div></article>
+</div>
+<section class="workforce-detail-grid">
+<article class="placeholder-card composition-card current-composition-card"><div class="composition-heading"><div class="panel-title">♟ &nbsp;Cơ cấu nhân sự hiện tại</div><select aria-label="Chọn tiêu chí cơ cấu nhân sự" id="currentCompositionDimension"><option selected="" value="region">Miền</option><option value="province">Tỉnh</option><option value="position">Vị trí</option><option value="tbhvName">Quản lý Cấp 1</option><option value="cvName">Quản lý Cấp 2</option><option value="gender">Giới tính</option><option value="age">Nhóm tuổi</option><option value="education">Học vấn</option><option value="tenure">Thâm niên</option><option value="status">Trạng thái NV</option></select></div><div class="quit-composition-bars" id="currentCompositionBars"></div><div class="placeholder-note" id="currentCompositionNote">Phân loại nhân sự hiện đang làm việc theo tiêu chí đã chọn.</div></article>
+<section class="table-card workforce-list-card">
+<div class="table-toolbar workforce-toolbar"><div class="workforce-toolbar-main"><strong>▦ &nbsp;Tình hình nhân sự theo đơn vị</strong><span id="rowCount">Dữ liệu mẫu · 12 dòng</span></div><div aria-label="Tham số phân tích danh sách nhân sự" class="hotspot-slicers workforce-parameter-buttons" id="workforceDimensionButtons"><button class="hotspot-chip active" data-dim="region" type="button">Miền</button><button class="hotspot-chip" data-dim="province" type="button">Tỉnh</button><button class="hotspot-chip" data-dim="position" type="button">Vị trí</button><button class="hotspot-chip" data-dim="tbhvName" type="button">Quản lý Cấp 1</button><button class="hotspot-chip" data-dim="cvName" type="button">Quản lý Cấp 2</button><button class="hotspot-chip" data-dim="age" type="button">Nhóm tuổi</button><button class="hotspot-chip" data-dim="status" type="button">Trạng thái NV</button></div></div>
+<div class="table-scroll"><table><thead><tr id="workforceTableHeaders"></tr></thead><tbody id="detailRows"></tbody><tfoot><tr class="total" id="workforceTableTotals"></tr></tfoot></table></div>
+</section>
+</section>
+
+<p class="demo-note">BẢN DEMO · KPI gốc dùng Google Sheets sau khi tải đủ 4 nguồn; biểu đồ thiếu cột nguồn vẫn là minh họa.</p>
+<div class="footer"></div>
+</div>
+<div class="page-view" id="pageREC">
+
+<section class="filters module-filters" id="recFilters">
+<div class="filter"><label>Dự án</label><select class="staffing-native-project" aria-label="Dự án từ Google Sheets"><option value="All">Tất cả dự án</option></select></div>
+<div class="filter"><label for="recYear">Năm</label><select id="recYear"><option value="2026">2026</option><option value="2025">2025</option></select></div>
+<div class="filter"><label>Tháng</label><select id="recMonth"><option value="0">Tất cả / YTD</option><option value="1">T01</option><option value="2">T02</option><option value="3">T03</option><option value="4">T04</option><option value="5">T05</option><option value="6">T06</option><option value="7">T07</option><option value="8">T08</option><option value="9">T09</option><option value="10">T10</option><option value="11">T11</option><option value="12">T12</option></select></div>
+<div class="filter"><label>Miền</label><select id="recRegion"><option value="All">Tất cả</option><option>Miền Bắc</option><option>Miền Trung</option><option>Miền Nam</option></select></div>
+<div class="filter"><label>Tỉnh</label><select id="recProvince"><option value="All">Tất cả</option><option>Hà Nội</option><option>Đà Nẵng</option><option>TP. Hồ Chí Minh</option><option>Đồng Nai</option></select></div>
+<div class="filter"><label>Vị trí tuyển</label><select id="recPosition"><option value="All">Tất cả</option><option>NVBH</option><option>NVHT</option><option>CHT-S</option><option>CVQL</option></select></div>
+<div class="filter"><label>Nguồn tuyển dụng</label><select id="recSource"><option value="All">Tất cả</option><option value="Internal">Nguồn nội bộ</option><option value="External">Nguồn bên ngoài</option><option value="Referral">Giới thiệu ứng viên</option><option value="Job Portal">Website tuyển dụng</option></select></div>
+<div class="filter"><label>Chuyên viên tuyển dụng</label><select id="recRecruiter"><option value="All">Tất cả</option><option>Nguyễn An</option><option>Trần Bình</option><option>Lê Chi</option></select></div>
+</section>
+<section class="rec-top-overview" aria-label="Tổng quan tuyển dụng">
+<article class="module-card rec-source-top"><div class="module-card-head"><div><h3>NGUỒN TUYỂN DỤNG</h3><p>Cơ cấu số yêu cầu theo nguồn được gán (không phải số ứng viên)</p></div></div><div class="rec-source-donut-layout" id="recSources" aria-live="polite"></div></article>
+<section class="module-card rec-status-panel" id="recKpis" aria-label="Trạng thái yêu cầu tuyển dụng">
+  <div class="module-card-head"><div><h3>TRẠNG THÁI YÊU CẦU TUYỂN DỤNG</h3><p>Tổng quan xử lý yêu cầu và tình trạng đúng hạn</p></div><span class="unit-tag">Yêu cầu</span></div>
+  <div class="rec-status-metrics">
+    <div class="rec-status-stat"><span>Tổng yêu cầu</span><strong id="recTotal">--</strong><small>100% tổng yêu cầu</small></div>
+    <div class="rec-status-stat"><span>Đã hoàn thành</span><strong id="recDone">--</strong><small id="recDonePercent">--</small></div>
+    <div class="rec-status-stat"><span>Đang tuyển</span><strong id="recProcessing">--</strong><small id="recProcessingPercent">--</small></div>
+    <div class="rec-status-stat rec-status-sla"><span><i class="rec-dot rec-dot-blue"></i>Trong hạn</span><strong id="recWithin">--</strong><small id="recWithinPercent">--</small></div>
+    <div class="rec-status-stat rec-status-sla"><span><i class="rec-dot rec-dot-orange"></i>Quá hạn</span><strong id="recLate">--</strong><small id="recLatePercent">--</small></div>
+  </div>
+  <div class="rec-status-bottom">
+    <div class="rec-status-progress-head"><span>Cơ cấu yêu cầu đang tuyển</span><b id="recProcessingSummary">-- yêu cầu</b></div>
+    <div class="rec-status-track" role="img" aria-label="Tỷ trọng yêu cầu trong hạn và quá hạn"><div id="recWithinBar" class="rec-status-within" style="width:0%"></div><div id="recLateBar" class="rec-status-late" style="width:0%"></div></div>
+    <div class="rec-status-footer">Hoàn thành đúng hạn: <strong id="recOnTime">--</strong><span id="recOnTimeNote">--</span></div>
+  </div>
+</section>
+</section>
+<section class="rec-lower-grid">
+<article class="module-card rec-pipeline-card"><div class="module-card-head"><div><h3>PHỄU TUYỂN DỤNG</h3><p>Ứng viên giả lập theo tiến độ yêu cầu đã lọc</p></div><span class="unit-tag">Ứng viên</span></div><div class="pipeline" id="recPipeline"></div><div class="module-note">Phễu ứng viên giả lập theo từng yêu cầu, tính đến ngày chốt; giai đoạn nhận việc khớp số nhân sự đã nhận việc của các yêu cầu được lọc.</div></article>
+<article class="module-card rec-trend-card"><div class="module-card-head"><div><h3>XU HƯỚNG TUYỂN DỤNG</h3><p>Số nhân sự đã nhận việc theo tháng mở yêu cầu, tính đến ngày chốt. Chọn điểm để xem chi tiết tháng; chọn lại để xem YTD.</p></div><span class="unit-tag">Nhân sự</span></div><div class="demo-chart" id="recTrend"></div><p class="rec-trend-mobile-hint" aria-hidden="true">↔ Vuốt ngang để xem đủ 12 tháng</p></article>
+<article class="module-card rec-dimension-card rec-vacancy-card"><div class="module-card-head"><div><h3>NHU CẦU TUYỂN DỤNG THEO TIÊU CHÍ</h3><p id="recVacancySubtitle">Số vị trí còn thiếu theo miền</p></div><select id="recVacancyDimension" class="rec-dimension-select" aria-label="Chọn tiêu chí phân tích nhu cầu tuyển dụng"><option value="region">Miền</option><option value="province">Tỉnh</option><option value="position">Vị trí tuyển</option><option value="recruiter">Chuyên viên tuyển dụng</option><option value="status">Trạng thái yêu cầu</option><option value="sla">Tình trạng SLA</option></select></div><div class="demo-bars" id="recVacancy"></div><p class="rec-dimension-note" id="recVacancyNote">Phân tích theo bộ lọc Tuyển dụng.</p></article>
+</section>
+<section class="module-card module-table"><div class="module-card-head"><div><h3>CHI TIẾT YÊU CẦU TUYỂN DỤNG</h3><p>Danh sách yêu cầu tuyển dụng theo bộ lọc (dữ liệu minh họa)</p></div><button class="outline-action" data-preview-export="recTable" type="button">Xuất dữ liệu CSV</button></div><div class="table-scroll"><table id="recTable"><thead><tr><th>Mã yêu cầu</th><th>Ngày yêu cầu</th><th>Miền</th><th>Tỉnh</th><th>Vị trí</th><th>Số lượng</th><th>Đã tuyển</th><th>Còn thiếu</th><th>Trạng thái</th><th>Hạn hoàn thành</th><th>Đáp ứng thời hạn (SLA)</th><th>Chuyên viên tuyển dụng</th></tr></thead><tbody id="recRows"></tbody></table></div></section>
+<p class="demo-note">DỮ LIỆU GIẢ LẬP PHỤC VỤ DEMO · Tổng yêu cầu = Đã hoàn thành + Đang tuyển; Đang tuyển = Trong hạn + Quá hạn. Tỷ lệ hoàn thành đúng hạn = Yêu cầu hoàn thành đúng hạn / Tổng yêu cầu hoàn thành. Ngày chốt demo: 30/10/2026 cho YTD 2026; 31/12/2025 cho năm 2025; khi chọn tháng sử dụng ngày cuối tháng, không vượt ngày chốt. Phễu, nhu cầu còn thiếu và xu hướng đều dùng nhóm yêu cầu theo tháng mở; số đã nhận việc được tính đến ngày chốt báo cáo. Khi chọn tháng, điểm xu hướng khớp số Đã nhận việc trong phễu. Ngày nhận việc và giai đoạn ứng viên đều được giả lập, không phải dữ liệu nhân sự thực tế. Quy mô demo được giảm để dễ kiểm tra.</p><div class="footer"></div>
+</div>
+<div class="page-view" id="pageATD">
+
+<section class="filters module-filters att-filters" id="attFilters">
+<div class="filter"><label for="attYear">Năm</label><select id="attYear"><option value="2026">2026</option><option value="2025">2025</option></select></div>
+<div class="filter"><label for="attMonth">Tháng</label><select id="attMonth"><option value="0">Tất cả / YTD</option><option value="1">T01</option><option value="2">T02</option><option value="3">T03</option><option value="4">T04</option><option value="5">T05</option><option value="6">T06</option><option value="7">T07</option><option value="8">T08</option><option value="9">T09</option><option value="10">T10</option><option value="11">T11</option><option value="12">T12</option></select></div>
+<div class="filter"><label for="attRegion">Miền</label><select id="attRegion"><option value="All">Tất cả</option><option>Miền Bắc</option><option>Miền Trung</option><option>Miền Nam</option></select></div>
+<div class="filter"><label for="attProvince">Tỉnh/Thành phố</label><select id="attProvince"><option value="All">Tất cả</option><option>Hà Nội</option><option>Đà Nẵng</option><option>TP. Hồ Chí Minh</option><option>Cần Thơ</option></select></div>
+<div class="filter"><label for="attPosition">Vị trí</label><select id="attPosition"><option value="All">Tất cả</option><option>NVBH</option><option>NVHT</option><option>CHT-S</option><option>CVQL</option></select></div>
+</section>
+<section class="att-kpi-grid" aria-label="Các chỉ số chấm công">
+<article class="module-card att-kpi"><small>NHÂN SỰ TRONG PHẠM VI</small><strong id="attStaff">—</strong><span>Nhân viên có lịch làm việc</span></article>
+<article class="module-card att-kpi"><small>NGÀY CÔNG KẾ HOẠCH</small><strong id="attScheduled">—</strong><span>Ngày công</span></article>
+<article class="module-card att-kpi"><small>NGÀY CÔNG CÓ MẶT</small><strong id="attPresent">—</strong><span>Đúng giờ + Đi muộn</span></article>
+<article class="module-card att-kpi"><small>TỶ LỆ HIỆN DIỆN</small><strong id="attRate">—</strong><span>Ngày có mặt / Ngày công kế hoạch</span></article>
+<article class="module-card att-kpi"><small>ĐI MUỘN</small><strong id="attLate">—</strong><span>Lượt (nằm trong ngày có mặt)</span></article>
+<article class="module-card att-kpi"><small>NGHỈ PHÉP / VẮNG KHÔNG PHÉP</small><strong id="attLeaveAbsent">—</strong><span>Ngày nghỉ phép / Ngày vắng không phép</span></article>
+</section>
+<section class="att-chart-grid">
+<article class="module-card"><div class="module-card-head"><div><h3>XU HƯỚNG CHẤM CÔNG</h3><p>Tỷ lệ hiện diện theo tháng; chọn tháng để lọc, chọn lại để về YTD</p></div><span class="unit-tag">%</span></div><div class="att-trend" id="attTrend"></div></article>
+<article class="module-card"><div class="module-card-head"><div><h3>CƠ CẤU NGÀY CÔNG</h3><p>Các nhóm trạng thái loại trừ nhau; đi muộn thuộc nhóm có mặt</p></div><span class="unit-tag">Ngày công</span></div><div class="att-status-summary" id="attBreakdown"></div></article>
+</section>
+<section class="module-card att-detail"><div class="module-card-head"><div><h3>CHI TIẾT CHẤM CÔNG THEO NHÂN VIÊN</h3><p>Thống kê theo kỳ và bộ lọc; dữ liệu được mô phỏng</p></div><span class="unit-tag">Nhân viên</span></div><div class="table-scroll"><table><thead><tr><th>Mã NV</th><th>Nhân viên</th><th>Miền</th><th>Tỉnh</th><th>Vị trí</th><th>Công kế hoạch</th><th>Đúng giờ</th><th>Đi muộn</th><th>Nghỉ phép</th><th>Vắng không phép</th><th>Tỷ lệ hiện diện</th></tr></thead><tbody id="attRows"></tbody></table></div></section>
+<p class="demo-note">DỮ LIỆU CHẤM CÔNG GIẢ LẬP · Ngày công kế hoạch = Đúng giờ + Đi muộn + Nghỉ phép + Vắng không phép. Có mặt = Đúng giờ + Đi muộn. Tỷ lệ hiện diện = Có mặt / Kế hoạch. Không tính thứ bảy, chủ nhật; chưa mô phỏng ngày lễ, tăng ca hay ca đêm. Năm 2026 chốt đến 30/10/2026. Nhấp biểu đồ chọn tháng chỉ thay đổi kỳ hiển thị, không thay đổi hình dạng xu hướng.</p><div class="footer"></div>
+</div>
+<div class="page-view" id="pagePAYROLL">
+
+<section class="filters module-filters" id="payFilters">
+<div class="filter"><label>Dự án</label><select class="staffing-native-project" aria-label="Dự án từ Google Sheets"><option value="All">Tất cả dự án</option></select></div>
+<div class="filter"><label>Năm</label><select id="payYear"><option value="2026">2026</option><option value="2025">2025</option></select></div>
+<div class="filter"><label>Tháng</label><select id="payMonth"><option value="0">Tất cả / YTD</option><option value="1">T01</option><option value="2">T02</option><option value="3">T03</option><option value="4">T04</option><option value="5">T05</option><option value="6">T06</option><option value="7">T07</option><option value="8">T08</option><option value="9">T09</option><option value="10" selected>T10</option><option value="11">T11</option><option value="12">T12</option></select></div>
+<div class="filter"><label>Miền</label><select id="payRegion"><option value="All">Tất cả</option><option>Miền Bắc</option><option>Miền Trung</option><option>Miền Nam</option></select></div>
+<div class="filter"><label>Tỉnh</label><select id="payProvince"><option value="All">Tất cả</option><option>Hà Nội</option><option>Đà Nẵng</option><option>TP. Hồ Chí Minh</option><option>Đồng Nai</option></select></div>
+<div class="filter"><label>Vị trí</label><select id="payPosition"><option value="All">Tất cả</option><option>NVBH</option><option>NVHT</option><option>CHT-S</option><option>CVQL</option></select></div>
+<div class="filter"><label>Loại chi phí</label><select id="payType"><option value="All">Tất cả</option><option value="Fixed">Chi phí cố định</option><option value="Variable">Chi phí biến đổi</option><option value="Allowance">Phụ cấp</option></select></div>
+<div class="filter"><label>Đơn vị / Dự án</label><select id="payProject"><option value="All">Tất cả</option><option value="VNM - Sales">VNM - Kinh doanh</option><option value="VNM - Operations">VNM - Vận hành</option><option value="VNM - Office">VNM - Văn phòng</option></select></div>
+</section>
+<div class="module-section-title">TỔNG QUAN QUỸ LƯƠNG VÀ CHI PHÍ</div>
+<section class="payroll-summary-grid" id="payrollSummaryGrid">
+ <div class="payroll-summary-main-pair">
+  <article class="payroll-summary-card"><small>Nhân sự trong tháng</small><strong id="payTopHC">276</strong><div class="payroll-summary-meta"><span id="payTopHCCompare">Cùng kỳ: 315</span><b id="payTopHCVar">-12,4%</b></div></article>
+  <article class="payroll-summary-card"><small>Tổng chi phí lương</small><strong id="payTopTotal">3,13 tỷ</strong><div class="payroll-summary-meta"><span id="payTopTotalCompare">Cùng kỳ: 3,66 tỷ</span><b id="payTopTotalVar">-14,6%</b></div></article>
+ </div>
+  <article class="payroll-summary-card"><small>Tổng Incentive</small><strong id="payTopIncentive">0,60 tỷ</strong><div class="payroll-summary-meta"><span id="payTopIncentiveCompare">Cùng kỳ: 0,74 tỷ</span><b id="payTopIncentiveVar">-18,9%</b></div></article>
+  <article class="payroll-summary-card"><small>Chi phí bình quân/HC</small><strong id="payTopAvg">11,33 triệu</strong><div class="payroll-summary-meta"><span id="payTopAvgCompare">Cùng kỳ: 11,62 triệu</span><b id="payTopAvgVar">-2,5%</b></div></article>
+</section>
+<section class="payroll-top-chart-grid">
+  <article class="module-card payroll-line-card"><div class="module-card-head"><div class="payroll-trend-heading"><h3>TỔNG CHI PHÍ LƯƠNG THEO THÁNG</h3><p>Theo tháng, so với cùng kỳ năm trước · Nhấn điểm để xem tháng; nhấn lại xem YTD</p><div class="payroll-chart-legend"><span><i class="current"></i>Hiện tại</span><span><i class="compare"></i>Cùng kỳ</span></div></div><div class="payroll-head-actions"><span class="unit-tag">Tỷ đồng</span></div></div><div class="payroll-line-chart" id="payTrend"></div><p class="pay-period-note" id="payPeriodNote" aria-live="polite"></p></article>
+  <article class="module-card payroll-line-card payroll-incentive-card"><div class="module-card-head"><div class="payroll-trend-heading"><h3>CHI PHÍ INCENTIVE THEO THÁNG</h3><p>Thưởng / hoa hồng theo tháng · So sánh cùng kỳ</p><div class="payroll-chart-legend"><span><i class="current"></i>Hiện tại</span><span><i class="compare"></i>Cùng kỳ</span></div></div><div class="payroll-head-actions"><span class="unit-tag">Tỷ đồng</span></div></div><div class="payroll-line-chart compact" id="payIncentiveTrend"></div></article>
+  <article class="module-card payroll-line-card"><div class="module-card-head"><div class="payroll-trend-heading"><h3>CHI PHÍ BÌNH QUÂN TRÊN NHÂN SỰ THEO THÁNG</h3><p>Triệu đồng/HC · So sánh cùng kỳ</p><div class="payroll-chart-legend"><span><i class="current"></i>Hiện tại</span><span><i class="compare"></i>Cùng kỳ</span></div></div><div class="payroll-head-actions right-only"><span class="unit-tag">Triệu đồng / nhân sự</span></div></div><div class="payroll-line-chart compact" id="payAvgTrend"></div></article>
+</section>
+<section class="module-grid payroll-three-dimensions" style="display:grid;grid-template-columns:minmax(0,4fr) minmax(0,3fr) minmax(0,3fr);gap:10px;align-items:stretch;">
+<article class="module-card pay-dimension-card"><div class="module-card-head"><div><h3 id="payCostDimensionTitle">TỔNG CHI PHÍ LƯƠNG PHÂN BỔ THEO</h3><p id="payCostDimensionDescription">Phân bổ tổng chi phí theo miền</p></div><select class="pay-dimension-select" id="payCostDimension" aria-label="Chọn tiêu chí phân tích tổng chi phí"><option value="region">Miền</option><option value="province">Tỉnh</option><option value="position">Vị trí</option><option value="project">Đơn vị / Dự án</option><option value="type">Loại chi phí</option></select></div><div class="demo-bars" id="payRegionBars"></div><p class="pay-dimension-note" id="payCostDimensionNote"></p></article>
+<article class="module-card pay-dimension-card"><div class="module-card-head"><div><h3 id="payIncentiveDimensionTitle">CHI PHÍ INCENTIVE PHÂN BỔ THEO</h3><p id="payIncentiveDimensionDescription">Phân bổ Incentive theo tiêu chí (dữ liệu demo)</p></div><select class="pay-dimension-select" id="payIncentiveDimension" aria-label="Chọn tiêu chí phân tích Incentive"><option value="region">Miền</option><option value="province">Tỉnh</option><option value="position">Vị trí</option><option value="project">Đơn vị / Dự án</option></select></div><div class="demo-bars" id="payIncentiveBars"></div><p class="pay-dimension-note" id="payIncentiveDimensionNote"></p></article>
+<article class="module-card pay-dimension-card"><div class="module-card-head"><div><h3 id="payAvgDimensionTitle">CHI PHÍ BÌNH QUÂN PHÂN BỔ THEO</h3><p id="payAvgDimensionDescription">Chi phí bình quân theo vị trí</p></div><select class="pay-dimension-select" id="payAvgDimension" aria-label="Chọn tiêu chí phân tích chi phí bình quân"><option value="position">Vị trí</option><option value="region">Miền</option><option value="province">Tỉnh</option><option value="project">Đơn vị / Dự án</option></select></div><div class="demo-bars" id="payPositionBars"></div><p class="pay-dimension-note" id="payAvgDimensionNote"></p></article>
+</section>
+<section class="module-card module-table"><div class="module-card-head"><div><h3>CHI TIẾT CHI PHÍ LƯƠNG</h3><p>Chi tiết chi phí lương theo nhân viên, vị trí và kỳ lương</p></div><button class="outline-action" data-preview-export="payTable" type="button">Xuất dữ liệu CSV</button></div><div class="table-scroll"><table id="payTable"><thead><tr><th>Mã nhân viên</th><th>Họ và tên</th><th>Miền</th><th>Vị trí</th><th>Tháng lương</th><th>Lương cơ bản</th><th>Thưởng / hoa hồng</th><th>Phụ cấp</th><th>Tổng chi phí</th></tr></thead><tbody id="payRows"></tbody></table></div></section>
+<p class="demo-note">DỮ LIỆU GIẢ LẬP PHỤC VỤ DEMO · Chi phí minh họa theo tháng; cần thay bằng Payroll source, mapping cấu phần và quy tắc tính đã được xác nhận.</p><div class="footer"></div>
+</div>
+</div>
+</div>
+<script src="./assets/js/01-core-script-1.js"></script>
+
+<script src="./assets/js/02-staffing-three-page-navigation.js" id="staffing-three-page-navigation"></script>
+
+<script src="./assets/js/03-staffing-demo-data-v46.js" id="staffing-demo-data-v46"></script>
+
+<script src="./assets/js/04-attendance-v102-logic.js" id="attendance-v102-logic"></script>
+
+<script src="./assets/js/05-v126-sticky-global-toolbar-size.js" id="v126-sticky-global-toolbar-size"></script>
+
+<script src="./assets/js/06-v127-acacy-presentation-only.js" id="v127-acacy-presentation-only"></script>
+
+<script src="./assets/js/09-v132-top-nav-height.js" id="v132-top-nav-height"></script>
+
+<script src="./assets/js/10-v144-hc-canvas-initial-sharpness-fix.js" id="v144-hc-canvas-initial-sharpness-fix"></script>
+
+<script src="./assets/js/11-v153-recruitment-green-redesign-script.js" id="v153-recruitment-green-redesign-script"></script>
+
+<script src="./assets/js/12-v153b-recruitment-kpi-sync-events.js" id="v153b-recruitment-kpi-sync-events"></script>
+
+<script src="./assets/js/13-v154-kpi-outline-icons.js" id="v154-kpi-outline-icons"></script>
+
+<script src="./assets/js/14-v155-rec-blue-svg-colors.js" id="v155-rec-blue-svg-colors"></script>
+
+<script src="./assets/js/15-v159-theme-toggle-script.js" id="v159-theme-toggle-script"></script>
+<script src="./assets/js/16-v180-flat-header-filter-mount.js" id="v180-flat-header-filter-mount"></script>
+<script src="./assets/js/17-preview-export.js"></script>
+</body>
+</html>

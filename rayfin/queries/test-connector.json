@@ -1,0 +1,5 @@
+
+{
+  "query": "EVALUATE ROW(\"Connection\", \"OK\")",
+  "resultSetRowCountLimit": 10
+}

@@ -1,0 +1,5 @@
+
+{
+  "query": "EVALUATE CALCULATETABLE(SUMMARIZECOLUMNS('D_Date'[Month], \"NS Hiện tại\", [NS Hiện tại], \"NS Kế hoạch\", [NS Kế hoạch], \"NS Mới\", [NS Mới], \"NS Nghỉ\", [NS Nghỉ]), 'D_Date'[Year] = 2026, 'D_Date'[Month] >= 1, 'D_Date'[Month] <= 10) ORDER BY 'D_Date'[Month]",
+  "resultSetRowCountLimit": 20
+}
